@@ -14,7 +14,7 @@ Ce formatif utilise des **jalons progressifs** avec retroaction detaillee:
 | Jalon | Points | Verification |
 |-------|--------|-------------|
 | **Milestone 1** | 25 pts | Script existe, syntaxe valide, tests locaux executes |
-| **Milestone 2** | 35 pts | I2C initialise, capteur BMP280 cree, lecture temperature/pression |
+| **Milestone 2** | 35 pts | I2C initialise, capteur AHT20 cree, lecture temperature/humidite |
 | **Milestone 3** | 40 pts | Fonction main(), gestion d'erreurs, qualite du code |
 
 **Chaque test echoue vous dit**:
@@ -30,48 +30,46 @@ Ce formatif vise a verifier que vous etes capable de :
 1. Creer une cle SSH sur le Raspberry Pi et l'ajouter a votre compte GitHub
 2. Installer UV et gerer les dependances Python
 3. Detecter un capteur I2C avec `i2cdetect`
-4. Lire un capteur BMP280 (temperature, pression, altitude)
+4. Lire un capteur AHT20 (temperature, humidite)
 5. Controler un NeoSlider (potentiometre + LEDs) - optionnel
 
 ---
 
 ## Workflow de soumission
 
-⚠️ **IMPORTANT** : Pour que votre travail soit accepté, vous devez **exécuter les tests localement sur le Raspberry Pi AVANT de pousser**.
-
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                    WORKLOAD FORMATIF F1                        │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                  │
-│  1. Sur le Raspberry Pi (via SSH avec mot de passe)            │
-│     └─ Créer une clé SSH                                      │
-│     └─ Afficher la clé publique                               │
-│                                                                  │
-│  2. Sur GitHub (via navigateur)                               │
-│     └─ Ajouter la clé SSH à votre compte                      │
-│     └─ Tester la connexion (ssh -T git@github.com)             │
-│                                                                  │
-│  3. Sur le Raspberry Pi                                        │
-│     └─ Installer UV                                            │
-│     └─ Cloner votre dépôt GitHub (avec URL SSH)                │
-│     └─ Créer test_bmp280.py                                   │
-│     └─ Exécuter: python3 run_tests.py                         │
-│     └─ Corriger les erreurs                                    │
-│     └─ Pousser: git add, commit, push                         │
-│                                                                  │
-│  4. GitHub Actions valide automatiquement                     │
-│     └─ Vérifie les marqueurs de tests                         │
-│     └─ Confirme que vous avez tout complété                   │
-│                                                                  │
-└─────────────────────────────────────────────────────────────────┘
++-----------------------------------------------------------------+
+|                    WORKLOAD FORMATIF F1                          |
++-----------------------------------------------------------------+
+|                                                                  |
+|  1. Sur le Raspberry Pi (via SSH avec mot de passe)              |
+|     +-- Creer une cle SSH                                        |
+|     +-- Afficher la cle publique                                 |
+|                                                                  |
+|  2. Sur GitHub (via navigateur)                                  |
+|     +-- Ajouter la cle SSH a votre compte                        |
+|     +-- Tester la connexion (ssh -T git@github.com)              |
+|                                                                  |
+|  3. Sur le Raspberry Pi                                          |
+|     +-- Installer UV                                             |
+|     +-- Cloner votre depot GitHub (avec URL SSH)                 |
+|     +-- Creer test_aht20.py                                     |
+|     +-- Executer: python3 run_tests.py                           |
+|     +-- Corriger les erreurs                                     |
+|     +-- Pousser: git add, commit, push                           |
+|                                                                  |
+|  4. GitHub Actions valide automatiquement                        |
+|     +-- Verifie les marqueurs de tests                           |
+|     +-- Confirme que vous avez tout complete                     |
+|                                                                  |
++-----------------------------------------------------------------+
 ```
 
 ---
 
-## Instructions détaillées
+## Instructions detaillees
 
-### Étape 1 : Créer une clé SSH sur le Raspberry Pi
+### Etape 1 : Creer une cle SSH sur le Raspberry Pi
 
 Connectez-vous d'abord au Raspberry Pi avec votre mot de passe :
 
@@ -79,35 +77,35 @@ Connectez-vous d'abord au Raspberry Pi avec votre mot de passe :
 ssh utilisateur@HOSTNAME.local
 ```
 
-Puis, générez une clé SSH **directement sur le Raspberry Pi** :
+Puis, generez une cle SSH **directement sur le Raspberry Pi** :
 
 ```bash
-# Générer la clé avec un commentaire identifiant
+# Generer la cle avec un commentaire identifiant
 ssh-keygen -t ed25519 -C "iot-cegep@etu.cegep.qc.ca" -f ~/.ssh/id_ed25519_iot
 ```
 
-- Appuyez **Entrée** pour accepter l'emplacement par défaut
-- Appuyez **Entrée** deux fois pour laisser la passphrase vide
+- Appuyez **Entree** pour accepter l'emplacement par defaut
+- Appuyez **Entree** deux fois pour laisser la passphrase vide
 
-#### Afficher la clé publique
+#### Afficher la cle publique
 
 ```bash
 cat ~/.ssh/id_ed25519_iot.pub
 ```
 
-Copiez **toute** la ligne affichée (commence par `ssh-ed25519 ...`)
+Copiez **toute** la ligne affichee (commence par `ssh-ed25519 ...`)
 
 ---
 
-### Étape 2 : Ajouter la clé SSH à votre compte GitHub
+### Etape 2 : Ajouter la cle SSH a votre compte GitHub
 
 1. Allez sur https://github.com et connectez-vous
-2. Cliquez sur votre photo → **Settings**
-3. Menu gauche → **SSH and GPG keys**
+2. Cliquez sur votre photo -> **Settings**
+3. Menu gauche -> **SSH and GPG keys**
 4. Cliquez sur **New SSH key**
 5. Remplissez :
    - **Title** : `Raspberry Pi IoT - Cours 243-413-SH`
-   - **Key** : Collez la clé publique copiée
+   - **Key** : Collez la cle publique copiee
    - **Key type** : Authentication Key
 6. Cliquez sur **Add SSH key**
 
@@ -116,11 +114,11 @@ Copiez **toute** la ligne affichée (commence par `ssh-ed25519 ...`)
 Toujours sur le Raspberry Pi :
 
 ```bash
-# Ajouter la clé à l'agent SSH
+# Ajouter la cle a l'agent SSH
 eval "$(ssh-agent -s)"
 ssh-add ~/.ssh/id_ed25519_iot
 
-# Créer un config pour utiliser cette clé avec GitHub
+# Creer un config pour utiliser cette cle avec GitHub
 cat > ~/.ssh/config << 'EOF'
 Host github.com
     HostName github.com
@@ -129,7 +127,7 @@ Host github.com
     IdentitiesOnly yes
 EOF
 
-# Sécuriser le fichier config
+# Securiser le fichier config
 chmod 600 ~/.ssh/config
 ```
 
@@ -139,18 +137,18 @@ chmod 600 ~/.ssh/config
 ssh -T git@github.com
 ```
 
-**Résultat attendu** (si succès) :
+**Resultat attendu** (si succes) :
 ```
 Hi votrenom! You've successfully authenticated, but GitHub does not provide shell access.
 ```
 
-> 🎉 **Bravo !** Votre clé SSH est configurée et vous pouvez maintenant cloner et pousser directement depuis le Raspberry Pi !
+> Bravo ! Votre cle SSH est configuree et vous pouvez maintenant cloner et pousser directement depuis le Raspberry Pi !
 
 ---
 
-### Étape 3 : Installer UV et cloner le dépôt
+### Etape 3 : Installer UV et cloner le depot
 
-Une fois la clé SSH configurée :
+Une fois la cle SSH configuree :
 
 ```bash
 # Installer UV
@@ -160,22 +158,22 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 source ~/.bashrc
 
 # Configurer Git (IMPORTANT!)
-git config --global user.name "Prénom Nom"
+git config --global user.name "Prenom Nom"
 git config --global user.email "votre.email@cegepsherbrooke.qc.ca"
 git config --global init.defaultbranch main
 ```
 
 ```bash
-# Cloner votre dépôt GitHub Classroom avec l'URL SSH
+# Cloner votre depot GitHub Classroom avec l'URL SSH
 git clone git@github.com:tge-sherbrooke/semaine-1-f1-votre-username.git
 cd semaine-1-f1-votre-username
 ```
 
-> **Note** : Utilisez l'URL **SSH** affichée sur GitHub (commence par `git@github.com:`)
+> **Note** : Utilisez l'URL **SSH** affichee sur GitHub (commence par `git@github.com:`)
 
 ---
 
-### Étape 4 : Activer I2C et vérifier les capteurs
+### Etape 4 : Activer I2C et verifier les capteurs
 
 ```bash
 # Activer I2C
@@ -189,46 +187,45 @@ sudo i2cdetect -y 1
 ```
 
 Vous devriez voir :
-- `77` pour le BMP280
+- `38` pour le AHT20
 - `30` pour le NeoSlider
 
-⚠️ **IMPORTANT** : Les capteurs fonctionnent UNIQUEMENT en 3.3V !
+**IMPORTANT** : Les capteurs fonctionnent UNIQUEMENT en 3.3V !
 
 ---
 
-### Étape 5 : Créer et tester le BMP280
+### Etape 5 : Creer et tester le AHT20
 
-Créez le fichier `test_bmp280.py` :
+Creez le fichier `test_aht20.py` :
 
 ```python
 # /// script
 # requires-python = ">=3.9"
-# dependencies = ["adafruit-circuitpython-bmp280", "adafruit-blinka"]
+# dependencies = ["adafruit-circuitpython-ahtx0", "adafruit-blinka"]
 # ///
-"""Test du capteur BMP280 via STEMMA QT/I2C."""
+"""Test du capteur AHT20 via STEMMA QT/I2C."""
 
 import board
-import adafruit_bmp280
+import adafruit_ahtx0
 
 i2c = board.I2C()
-sensor = adafruit_bmp280.Adafruit_BMP280_I2C(i2c, address=0x77)
+sensor = adafruit_ahtx0.AHTx0(i2c)
 
-print(f"Température: {sensor.temperature:.1f} °C")
-print(f"Pression: {sensor.pressure:.1f} hPa")
-print(f"Altitude: {sensor.altitude:.1f} m")
+print(f"Temperature: {sensor.temperature:.1f} C")
+print(f"Humidite: {sensor.relative_humidity:.1f} %")
 ```
 
 Testez-le :
 
 ```bash
-uv run test_bmp280.py
+uv run test_aht20.py
 ```
 
 ---
 
-### Étape 6 : Créer et tester le NeoSlider (optionnel)
+### Etape 6 : Creer et tester le NeoSlider (optionnel)
 
-Créez le fichier `test_neoslider.py` :
+Creez le fichier `test_neoslider.py` :
 
 ```python
 # /// script
@@ -265,43 +262,43 @@ uv run test_neoslider.py
 
 ---
 
-### Étape 7 : ⭐ Exécuter les tests locaux
+### Etape 7 : Executer les tests locaux
 
-**Ceci est l'étape obligatoire avant de pousser!**
+**Ceci est l'etape obligatoire avant de pousser!**
 
 ```bash
 python3 run_tests.py
 ```
 
 Le script `run_tests.py` va :
-1. ✅ Vérifier que votre clé SSH existe
-2. ✅ Vérifier que `test_bmp280.py` est correct
-3. ✅ Vérifier que `test_neoslider.py` est correct (optionnel)
-4. ✅ Scanner le bus I2C pour détecter les capteurs
-5. ✅ Créer des fichiers marqueurs dans `.test_markers/`
+1. Verifier que votre cle SSH existe
+2. Verifier que `test_aht20.py` est correct
+3. Verifier que `test_neoslider.py` est correct (optionnel)
+4. Scanner le bus I2C pour detecter les capteurs
+5. Creer des fichiers marqueurs dans `.test_markers/`
 
 Si tous les tests passent, vous verrez :
 ```
-🎉 TOUS LES TESTS SONT PASSÉS!
+TOUS LES TESTS SONT PASSES!
 ```
 
 ---
 
-### Étape 8 : Pousser votre travail
+### Etape 8 : Pousser votre travail
 
-Une fois les tests passés :
+Une fois les tests passes :
 
 ```bash
 git add .
-git commit -m "feat: tests BMP280 et NeoSlider complétés"
+git commit -m "feat: tests AHT20 et NeoSlider completes"
 git push
 ```
 
-GitHub Actions validera automatiquement que vous avez exécuté les tests.
+GitHub Actions validera automatiquement que vous avez execute les tests.
 
 ---
 
-## Câblage STEMMA QT
+## Cablage STEMMA QT
 
 | Fil | Raspberry Pi |
 |-----|--------------|
@@ -310,58 +307,58 @@ GitHub Actions validera automatiquement que vous avez exécuté les tests.
 | Bleu (SDA) | GPIO 2 |
 | Jaune (SCL) | GPIO 3 |
 
-⚠️ **VIN doit être connecté à 3.3V, PAS 5V !**
+**VIN doit etre connecte a 3.3V, PAS 5V !**
 
 ---
 
 ## Comprendre la validation
 
-### Pourquoi exécuter `run_tests.py` AVANT de pousser ?
+### Pourquoi executer `run_tests.py` AVANT de pousser ?
 
 Le formatif F1 utilise une validation en deux temps :
 
-| Étape | Où | Ce qui est validé |
+| Etape | Ou | Ce qui est valide |
 |-------|----|-------------------|
-| **run_tests.py** | Sur Raspberry Pi | - Clé SSH créée sur le Pi<br>- Connexion GitHub fonctionnelle<br>- Scripts créés<br>- Capteurs détectés |
-| **GitHub Actions** | Automatique après push | - Les marqueurs existent<br>- Syntaxe Python valide |
+| **run_tests.py** | Sur Raspberry Pi | - Cle SSH creee sur le Pi<br>- Connexion GitHub fonctionnelle<br>- Scripts crees<br>- Capteurs detectes |
+| **GitHub Actions** | Automatique apres push | - Les marqueurs existent<br>- Syntaxe Python valide |
 
-Cette approche garantit que vous avez **réellement** travaillé sur le matériel tout en bénéficiant de l'automatisation GitHub.
+Cette approche garantit que vous avez **reellement** travaille sur le materiel tout en beneficiant de l'automatisation GitHub.
 
-### Que se passe-t-il si je pousse sans exécuter les tests ?
+### Que se passe-t-il si je pousse sans executer les tests ?
 
 GitHub Actions affichera une erreur :
 ```
-❌ ERREUR: Les tests locaux n'ont pas été exécutés!
+ERREUR: Les tests locaux n'ont pas ete executes!
 ```
 
-Vous devrez alors exécuter `python3 run_tests.py` sur le Raspberry Pi et repousser.
+Vous devrez alors executer `python3 run_tests.py` sur le Raspberry Pi et repousser.
 
 ---
 
 ## Livrables
 
-Dans ce dépôt, vous devez avoir :
+Dans ce depot, vous devez avoir :
 
-- [ ] `test_bmp280.py` — Script de lecture du capteur BMP280
-- [ ] `test_neoslider.py` — Script de test du NeoSlider (optionnel)
-- [ ] `.test_markers/` — Dossier créé par `run_tests.py` (ne pas éditer manuellement!)
+- [ ] `test_aht20.py` -- Script de lecture du capteur AHT20
+- [ ] `test_neoslider.py` -- Script de test du NeoSlider (optionnel)
+- [ ] `.test_markers/` -- Dossier cree par `run_tests.py` (ne pas editer manuellement!)
 
 ---
 
-## Résumé des commandes
+## Resume des commandes
 
 ```bash
 # ===== SUR RASPBERRY PI (connexion initiale) =====
 ssh utilisateur@HOSTNAME.local
 
-# ===== CRÉER LA CLÉ SSH =====
+# ===== CREER LA CLE SSH =====
 ssh-keygen -t ed25519 -C "iot-cegep@etu.cegep.qc.ca" -f ~/.ssh/id_ed25519_iot
 
-# ===== AFFICHER LA CLÉ (à copier pour GitHub) =====
+# ===== AFFICHER LA CLE (a copier pour GitHub) =====
 cat ~/.ssh/id_ed25519_iot.pub
 
-# ===== AJOUTER LA CLÉ À GITHUB =====
-# Allez sur https://github.com → Settings → SSH and GPG keys → New SSH key
+# ===== AJOUTER LA CLE A GITHUB =====
+# Allez sur https://github.com -> Settings -> SSH and GPG keys -> New SSH key
 
 # ===== CONFIGURER SSH SUR LE PI =====
 eval "$(ssh-agent -s)"
@@ -382,10 +379,10 @@ ssh -T git@github.com
 curl -LsSf https://astral.sh/uv/install.sh | sh && source ~/.bashrc
 
 # ===== CONFIGURER GIT =====
-git config --global user.name "Prénom Nom"
+git config --global user.name "Prenom Nom"
 git config --global user.email "votre.email@etu.cegep.qc.ca"
 
-# ===== CLONER LE DÉPÔT (AVEC URL SSH) =====
+# ===== CLONER LE DEPOT (AVEC URL SSH) =====
 git clone git@github.com:tge-sherbrooke/semaine-1-f1-votre-username.git
 cd semaine-1-f1-votre-username
 
@@ -397,15 +394,15 @@ sudo apt install -y i2c-tools
 sudo i2cdetect -y 1
 
 # ===== TESTER LES CAPTEURS =====
-uv run test_bmp280.py
+uv run test_aht20.py
 uv run test_neoslider.py
 
-# ===== EXÉCUTER LES TESTS =====
+# ===== EXECUTER LES TESTS =====
 python3 run_tests.py
 
 # ===== POUSSER =====
 git add .
-git commit -m "feat: tests complétés"
+git commit -m "feat: tests completes"
 git push
 ```
 
@@ -413,9 +410,9 @@ git push
 
 ## Ressources
 
-- [Guide de l'étudiant](../deliverables/activites/semaine-1/labo/guide-étudiant.md)
-- [Guide de dépannage](../deliverables/activites/semaine-1/labo/guide-depannage.md)
+- [Guide de l'etudiant](../deliverables/activites/semaine-1/labo/guide-etudiant.md)
+- [Guide de depannage](../deliverables/activites/semaine-1/labo/guide-depannage.md)
 
 ---
 
-Bonne chance ! 🚀
+Bonne chance !
