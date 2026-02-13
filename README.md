@@ -7,6 +7,21 @@
 
 ---
 
+> **Pratique autonome** -- Ce formatif est une evaluation formative (non notee). Contrairement au laboratoire guide, vous devez completer les taches de maniere autonome. Les tests automatiques vous donnent une retroaction immediate a chaque push.
+
+## Ce que vous avez appris en labo
+
+Le laboratoire de la semaine 1 vous a guide a travers :
+
+- Connexion SSH au Raspberry Pi depuis votre poste Windows
+- Detection de peripheriques I2C avec `i2cdetect`
+- Lecture du capteur AHT20 (temperature et humidite)
+- Execution de scripts Python avec `uv run`
+
+Ce formatif vous demande d'appliquer ces competences de maniere autonome.
+
+---
+
 ## Progressive Milestones
 
 Ce formatif utilise des **jalons progressifs** avec retroaction detaillee:
